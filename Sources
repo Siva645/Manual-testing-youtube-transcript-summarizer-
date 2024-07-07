@@ -1,0 +1,40 @@
+pip install google-api-python-client
+pip install nltk
+from googleapiclient.discovery import build
+
+# Replace with your own API key
+API_KEY = 'your_api_key_here'
+
+# Create a service for interacting with YouTube Data API
+youtube = build('youtube', 'v3', developerKey=API_KEY)
+def get_transcript(video_id):
+    # Request the transcript for a video
+    results = youtube.captions().list(
+        part='snippet',
+        videoId=video_id
+    ).execute()
+
+    # Find the automatic caption track
+    for item in results.get('items', []):
+        if item['snippet']['trackKind'] == 'asr':
+            caption_id = item['id']
+            break
+
+    # Retrieve the transcript
+    transcript = youtube.captions().download(
+        id=caption_id,
+        tfmt='ttml'
+    ).execute()
+
+    # Extract the transcript text
+    transcript_text = transcript['body']
+
+  def main():
+    video_id = 'your_youtube_video_id_here'  # Replace with the YouTube video ID
+    transcript = get_transcript(video_id)
+    summary = summarize_transcript(transcript)
+    print("Summary:")
+    print(summary)
+
+if __name__ == "__main__":
+    main()  return transcript_text
